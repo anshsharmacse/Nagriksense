@@ -17,7 +17,7 @@ streamlit==1.25.0
 plotly==5.15.0
 
 # Image Processing (compatible with Streamlit)
- pillow>=7.1.0,<10
+ pillow==9.5
   # Satisfies Streamlit dependency
 
 # Packaging Helpers (for distutils support on Python >=3.12)
