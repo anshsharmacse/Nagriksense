@@ -1,0 +1,16 @@
+civic_sense_ai/
+├── requirements.txt
+├── database_setup.py
+├── violation_detector.py
+├── behavior_prediction.py
+├── aadhaar_validator.py
+├── app.py
+├── dashboard.py
+├── templates/
+│   ├── index.html
+│   ├── quiz.html
+│   └── profile.html
+├── static/
+│   └── style.css
+└── models/
+    └── yolov8n.pt
