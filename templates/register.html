@@ -1,0 +1,206 @@
+<!-- templates/register.html -->
+{% extends "base.html" %}
+
+{% block title %}Register - Civic Sense AI{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h3>Register for Civic Sense Assessment</h3>
+            </div>
+            <div class="card-body">
+                <form id="registrationForm">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="aadhaar" class="form-label">Aadhaar Number *</label>
+                                <input type="text" class="form-control" id="aadhaar" name="aadhaar" 
+                                       placeholder="Enter 12-digit Aadhaar number" maxlength="12" required>
+                                <div id="aadhaarValidation" class="form-text"></div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="phone" class="form-label">Phone Number *</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       pattern="[0-9]{10}" required>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="age" class="form-label">Age *</label>
+                                <input type="number" class="form-control" id="age" name="age" 
+                                       min="18" max="100" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="gender" class="form-label">Gender *</label>
+                                <select class="form-select" id="gender" name="gender" required>
+                                    <option value="">Select Gender</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="education" class="form-label">Education Level *</label>
+                                <select class="form-select" id="education" name="education" required>
+                                    <option value="">Select Education</option>
+                                    <option value="1">Primary School</option>
+                                    <option value="2">High School</option>
+                                    <option value="3">Graduate</option>
+                                    <option value="4">Post Graduate</option>
+                                    <option value="5">Professional</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="income" class="form-label">Income Level</label>
+                                <select class="form-select" id="income" name="income">
+                                    <option value="1">Low</option>
+                                    <option value="2" selected>Medium</option>
+                                    <option value="3">High</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label for="city_type" class="form-label">City Type</label>
+                                <select class="form-select" id="city_type" name="city_type">
+                                    <option value="1">Metro</option>
+                                    <option value="2" selected>Urban</option>
+                                    <option value="3">Semi-Urban</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>Data Usage Consent</h6>
+                                <div style="max-height: 200px; overflow-y: auto; font-size: 0.9em;">
+                                    <p>I hereby give my consent for verification of my Aadhaar number for the purpose of:</p>
+                                    <ul>
+                                        <li>Identity verification for civic enforcement system</li>
+                                        <li>Maintaining records as per legal requirements</li>
+                                        <li>Sending notifications regarding civic violations</li>
+                                    </ul>
+                                    <p>I understand that my data will be used only for stated purposes and stored securely.</p>
+                                </div>
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" id="consent" name="consent" required>
+                                    <label class="form-check-label" for="consent">
+                                        I agree to the terms and provide my consent for Aadhaar verification *
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" id="loadingSpinner"></span>
+                            Register & Take Quiz
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const aadhaarInput = document.getElementById('aadhaar');
+    const validationDiv = document.getElementById('aadhaarValidation');
+    const form = document.getElementById('registrationForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingSpinner = document.getElementById('loadingSpinner');
+
+    // Real-time Aadhaar validation
+    aadhaarInput.addEventListener('input', function() {
+        const aadhaar = this.value.replace(/\s/g, '');
+        
+        if (aadhaar.length === 12) {
+            fetch('/validate_aadhaar', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({aadhaar: aadhaar})
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.valid) {
+                    validationDiv.innerHTML = `<span class="text-success">✓ Valid Aadhaar: ${data.masked}</span>`;
+                    aadhaarInput.classList.remove('is-invalid');
+                    aadhaarInput.classList.add('is-valid');
+                } else {
+                    validationDiv.innerHTML = `<span class="text-danger">✗ ${data.message}</span>`;
+                    aadhaarInput.classList.remove('is-valid');
+                    aadhaarInput.classList.add('is-invalid');
+                }
+            });
+        } else {
+            validationDiv.innerHTML = '';
+            aadhaarInput.classList.remove('is-valid', 'is-invalid');
+        }
+    });
+
+    // Form submission
+    form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        submitBtn.disabled = true;
+        loadingSpinner.classList.remove('d-none');
+        
+        const formData = new FormData(form);
+        
+        fetch('/register', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Registration successful! Redirecting to quiz...');
+                window.location.href = data.redirect;
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(error => {
+            alert('Network error. Please try again.');
+        })
+        .finally(() => {
+            submitBtn.disabled = false;
+            loadingSpinner.classList.add('d-none');
+        });
+    });
+});
+</script>
+{% endblock %}
